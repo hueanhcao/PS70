@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <script type="text/javascript">
+        // <![CDATA[
+        var colour="magenta"; 
+        var sparkles=50;
+        var x=ox=400;
+        var y=oy=300;
+        var swide=800;
+        var shigh=600;
+        var sleft=sdown=0;
+        var tiny=new Array();
+        var star=new Array();
+        var starv=new Array();
+        var starx=new Array();
+        var stary=new Array();
+        var tinyx=new Array();
+        var tinyy=new Array();
+        var tinyv=new Array();
+        
+        window.onload=function() { if (document.getElementById) {
+          var i, rats, rlef, rdow;
+          for (var i=0; i<sparkles; i++) {
+            var rats=createDiv(3, 3);
+            rats.style.visibility="hidden";
+            rats.style.zIndex="999";
+            document.body.appendChild(tiny[i]=rats);
+            starv[i]=0;
+            tinyv[i]=0;
+            var rats=createDiv(5, 5);
+            rats.style.backgroundColor="transparent";
+            rats.style.visibility="hidden";
+            rats.style.zIndex="999";
+            var rlef=createDiv(1, 5);
+            var rdow=createDiv(5, 1);
+            rats.appendChild(rlef);
+            rats.appendChild(rdow);
+            rlef.style.top="2px";
+            rlef.style.left="0px";
+            rdow.style.top="0px";
+            rdow.style.left="2px";
+            document.body.appendChild(star[i]=rats);
+          }
+          set_width();
+          sparkle();
+        }}
+        
+        function sparkle() {
+          var c;
+          if (Math.abs(x-ox)>1 || Math.abs(y-oy)>1) {
+            ox=x;
+            oy=y;
+            for (c=0; c<sparkles; c++) if (!starv[c]) {
+              star[c].style.left=(starx[c]=x)+"px";
+              star[c].style.top=(stary[c]=y+1)+"px";
+              star[c].style.clip="rect(0px, 5px, 5px, 0px)";
+              star[c].childNodes[0].style.backgroundColor=star[c].childNodes[1].style.backgroundColor=(colour=="random")?newColour():colour;
+              star[c].style.visibility="visible";
+              starv[c]=50;
+              break;
+            }
+          }
+          for (c=0; c<sparkles; c++) {
+            if (starv[c]) update_star(c);
+            if (tinyv[c]) update_tiny(c);
+          }
+          setTimeout("sparkle()", 40);
+        }
+        
+        function update_star(i) {
+          if (--starv[i]==25) star[i].style.clip="rect(1px, 4px, 4px, 1px)";
+          if (starv[i]) {
+            stary[i]+=1+Math.random()*3;
+            starx[i]+=(i%5-2)/5;
+            if (stary[i]<shigh+sdown) {
+              star[i].style.top=stary[i]+"px";
+              star[i].style.left=starx[i]+"px";
+            }
+            else {
+              star[i].style.visibility="hidden";
+              starv[i]=0;
+              return;
+            }
+          }
+          else {
+            tinyv[i]=50;
+            tiny[i].style.top=(tinyy[i]=stary[i])+"px";
+            tiny[i].style.left=(tinyx[i]=starx[i])+"px";
+            tiny[i].style.width="2px";
+            tiny[i].style.height="2px";
+            tiny[i].style.backgroundColor=star[i].childNodes[0].style.backgroundColor;
+            star[i].style.visibility="hidden";
+            tiny[i].style.visibility="visible"
+          }
+        }
+        
+        function update_tiny(i) {
+          if (--tinyv[i]==25) {
+            tiny[i].style.width="1px";
+            tiny[i].style.height="1px";
+          }
+          if (tinyv[i]) {
+            tinyy[i]+=1+Math.random()*3;
+            tinyx[i]+=(i%5-2)/5;
+            if (tinyy[i]<shigh+sdown) {
+              tiny[i].style.top=tinyy[i]+"px";
+              tiny[i].style.left=tinyx[i]+"px";
+            }
+            else {
+              tiny[i].style.visibility="hidden";
+              tinyv[i]=0;
+              return;
+            }
+          }
+          else tiny[i].style.visibility="hidden";
+        }
+        
+        document.onmousemove=mouse;
+        function mouse(e) {
+          if (e) {
+            y=e.pageY;
+            x=e.pageX;
+          }
+          else {
+            set_scroll();
+            y=event.y+sdown;
+            x=event.x+sleft;
+          }
+        }
+        
+        window.onscroll=set_scroll;
+        function set_scroll() {
+          if (typeof(self.pageYOffset)=='number') {
+            sdown=self.pageYOffset;
+            sleft=self.pageXOffset;
+          }
+          else if (document.body && (document.body.scrollTop || document.body.scrollLeft)) {
+            sdown=document.body.scrollTop;
+            sleft=document.body.scrollLeft;
+          }
+          else if (document.documentElement && (document.documentElement.scrollTop || document.documentElement.scrollLeft)) {
+            sleft=document.documentElement.scrollLeft;
+            sdown=document.documentElement.scrollTop;
+          }
+          else {
+            sdown=0;
+            sleft=0;
+          }
+        }
+        
+        window.onresize=set_width;
+        function set_width() {
+          var sw_min=999999;
+          var sh_min=999999;
+          if (document.documentElement && document.documentElement.clientWidth) {
+            if (document.documentElement.clientWidth>0) sw_min=document.documentElement.clientWidth;
+            if (document.documentElement.clientHeight>0) sh_min=document.documentElement.clientHeight;
+          }
+          if (typeof(self.innerWidth)=='number' && self.innerWidth) {
+            if (self.innerWidth>0 && self.innerWidth<sw_min) sw_min=self.innerWidth;
+            if (self.innerHeight>0 && self.innerHeight<sh_min) sh_min=self.innerHeight;
+          }
+          if (document.body.clientWidth) {
+            if (document.body.clientWidth>0 && document.body.clientWidth<sw_min) sw_min=document.body.clientWidth;
+            if (document.body.clientHeight>0 && document.body.clientHeight<sh_min) sh_min=document.body.clientHeight;
+          }
+          if (sw_min==999999 || sh_min==999999) {
+            sw_min=800;
+            sh_min=600;
+          }
+          swide=sw_min;
+          shigh=sh_min;
+        }
+        
+        function createDiv(height, width) {
+          var div=document.createElement("div");
+          div.style.position="absolute";
+          div.style.height=height+"px";
+          div.style.width=width+"px";
+          div.style.overflow="hidden";
+          return (div);
+        }
+        
+        function newColour() {
+          var c=new Array();
+          c[0]=255;
+          c[1]=Math.floor(Math.random()*256);
+          c[2]=Math.floor(Math.random()*(256-c[1]/2));
+          c.sort(function(){return (0.5 - Math.random());});
+          return ("rgb("+c[0]+", "+c[1]+", "+c[2]+")");
+        }
+        // ]]>
+        </script>
+</head>
+
+<title> PS70: Intro to Digital Fabrication </title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="./style.css" rel="stylesheet">
+
+<nav class="navbar navbar-expand-sm navbar-light bg-light">
+  <div style="align-items:center ; justify-content:center; font-family:georgia; font-size:x-large" class="container-fluid">
+    <h4><a style =  "color:darkgray; font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif" class="nav-link" href="./index.html">home</a></h4>
+    <h3 class="nav-title"> <b><i> ps70: intro to digital fabrication </i></b></h3>
+    <div class="navbar-nav">
+      <h4><a style = "color:darkgray; font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif" class="nav-link" href="./about.html">about</a></h4>
+    </div>
+  </div>
+</nav>
+
+<body>
+  <meta charset="UTF-8">
+
+<xmp style="display:none;">
+
+
+
+  <h1><p style="font-family:georgia; font-size:x-large"> <i><b> LACQUER PORTAL </i></b> </p> </h1> 
+  <p style="font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif"> this week was such a whirlwind omg. i made a cylinder with a planetary gear system on top. i decorated the gears, which spun at high speed and created an optical illusion (?) but it was shiny and pretty to look at. i named it 'lacquer portal' because the black + the pearlescent materials remind me of lacquerware</p> 
+
+  <h2><p style="font-family:georgia; font-size:x-large"> <i><b> results </i></b> </p> </h2> 
+  <p style="font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif"> 
+
+  <video width="500" height="500" controls>
+    <source src="fast_lacquer_portal.mp4" type="video/mp4">
+  </video>
+
+  <img src="3.1.png" alt="lacquer portal" width="500" </img>
+
+
+
+  <h3><p style="font-family:georgia; font-size:x-large"> <i><b> construction </i></b> </p> </h3> 
+  <p style="font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif">  first, i made the gears. my original thought was to make three gears, one big one in the middle controlled by the motor, and a circle to hold them in. i made about four different iterations of gears, some of which are pictured below. on the third iteration, my file was saved as a 3-d image instead of as a drawing, so the laser cutter cut twice for every mark, and it didn’t cut continuous lines. my final iteration ended up being saved as a drawing, which solved this problem. i also created an internal gear for the inside gears to have something to grip onto as they spin around, which worked much better than a circle would have. </p>
+  <img src="3.2.png" alt="gear dummies" width="900" </img> 
+  <img src="3.3.png" alt="final gear cad" width="900" </img> 
+
+  <p style="font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif"> second, i made the plate for the gear, which was just an 18.5 cm circle with a .95 cm hole in the center. I attached the internal gear to the plate. </p>
+  <p style="font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif"> third, i made the body of the cylinder. i cut a 12cmx59cm rectangle, and used the heat gun to mold it into a cylinder. after molding, i realized i needed a hole for my cable, so i drilled a bunch of tiny holes then connected them and had a hole big enough for my cable. </p>
+  <img src="3.4.png" alt="warm acrylic" width="900" </img> 
+ <p style="font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif"> finally, i attached the motor. i soldered the wires to the motor, then i tried to haphazardly hot glue the motor through the hole in the gear, which did not work (surprise surprise), and i pulled it out which reminded me of a dr pimple popper video. after that, i found a small washer-type object that would fit pretty well around the motor. i attached that to the motor, securing it using hot glue, then i attached the secured motor to the gear hole using a lot more glue. it was a bit tricky because the gear had to become glued to the hole of the gear and the hole of the plate without touching the plate. it worked!! </p>
+ 
+  <h4><p style="font-family:georgia; font-size:x-large"> <i><b> testing and making it go spin spin </i></b> </p> </h4> 
+  <p style="font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif"> i powered up the gear using the techniques we learned in class (seen below). the gear would only spin when the motor was pushed through the plate, or else it would drag down the gear onto the plate and the gear couldn’t spin freely. to address this, i tried duct tape (to no avail) then hot glued the motor to the bottom of the plate while pushing really hard. this worked! now my gear spins freely. </p>
+  <img src="3.5.png" alt="portal guts" width="900" </img> 
+
+  <p style="font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif"> i played around with a potentiometer to modify the speed, but after installing it onto the circuit, i realized full throttle is the only way to go. this wasn’t really a choice, as for some reason, when i put the potentiometer on the board, the circuit stopped working. i placed my breadboard inside of my cylinder, then placed the lid on top of the cylinder. finally, my sculpture was complete! </p>
+
+  <p style="font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif"> here is a longer video that shows the portal from start to finish!!! </p>
+
+  <video width="500" height="900" controls>
+    <source src="lacquer portal feature film.mp4" type="video/mp4">
+  </video>
+</xmp>
+</body>
+
+<script src="./strapdown.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" ></script>
+
+</html>
+
