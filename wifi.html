@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <script type="text/javascript">
+        // <![CDATA[
+        var colour="magenta"; 
+        var sparkles=50;
+        var x=ox=400;
+        var y=oy=300;
+        var swide=800;
+        var shigh=600;
+        var sleft=sdown=0;
+        var tiny=new Array();
+        var star=new Array();
+        var starv=new Array();
+        var starx=new Array();
+        var stary=new Array();
+        var tinyx=new Array();
+        var tinyy=new Array();
+        var tinyv=new Array();
+        
+        window.onload=function() { if (document.getElementById) {
+          var i, rats, rlef, rdow;
+          for (var i=0; i<sparkles; i++) {
+            var rats=createDiv(3, 3);
+            rats.style.visibility="hidden";
+            rats.style.zIndex="999";
+            document.body.appendChild(tiny[i]=rats);
+            starv[i]=0;
+            tinyv[i]=0;
+            var rats=createDiv(5, 5);
+            rats.style.backgroundColor="transparent";
+            rats.style.visibility="hidden";
+            rats.style.zIndex="999";
+            var rlef=createDiv(1, 5);
+            var rdow=createDiv(5, 1);
+            rats.appendChild(rlef);
+            rats.appendChild(rdow);
+            rlef.style.top="2px";
+            rlef.style.left="0px";
+            rdow.style.top="0px";
+            rdow.style.left="2px";
+            document.body.appendChild(star[i]=rats);
+          }
+          set_width();
+          sparkle();
+        }}
+        
+        function sparkle() {
+          var c;
+          if (Math.abs(x-ox)>1 || Math.abs(y-oy)>1) {
+            ox=x;
+            oy=y;
+            for (c=0; c<sparkles; c++) if (!starv[c]) {
+              star[c].style.left=(starx[c]=x)+"px";
+              star[c].style.top=(stary[c]=y+1)+"px";
+              star[c].style.clip="rect(0px, 5px, 5px, 0px)";
+              star[c].childNodes[0].style.backgroundColor=star[c].childNodes[1].style.backgroundColor=(colour=="random")?newColour():colour;
+              star[c].style.visibility="visible";
+              starv[c]=50;
+              break;
+            }
+          }
+          for (c=0; c<sparkles; c++) {
+            if (starv[c]) update_star(c);
+            if (tinyv[c]) update_tiny(c);
+          }
+          setTimeout("sparkle()", 40);
+        }
+        
+        function update_star(i) {
+          if (--starv[i]==25) star[i].style.clip="rect(1px, 4px, 4px, 1px)";
+          if (starv[i]) {
+            stary[i]+=1+Math.random()*3;
+            starx[i]+=(i%5-2)/5;
+            if (stary[i]<shigh+sdown) {
+              star[i].style.top=stary[i]+"px";
+              star[i].style.left=starx[i]+"px";
+            }
+            else {
+              star[i].style.visibility="hidden";
+              starv[i]=0;
+              return;
+            }
+          }
+          else {
+            tinyv[i]=50;
+            tiny[i].style.top=(tinyy[i]=stary[i])+"px";
+            tiny[i].style.left=(tinyx[i]=starx[i])+"px";
+            tiny[i].style.width="2px";
+            tiny[i].style.height="2px";
+            tiny[i].style.backgroundColor=star[i].childNodes[0].style.backgroundColor;
+            star[i].style.visibility="hidden";
+            tiny[i].style.visibility="visible"
+          }
+        }
+        
+        function update_tiny(i) {
+          if (--tinyv[i]==25) {
+            tiny[i].style.width="1px";
+            tiny[i].style.height="1px";
+          }
+          if (tinyv[i]) {
+            tinyy[i]+=1+Math.random()*3;
+            tinyx[i]+=(i%5-2)/5;
+            if (tinyy[i]<shigh+sdown) {
+              tiny[i].style.top=tinyy[i]+"px";
+              tiny[i].style.left=tinyx[i]+"px";
+            }
+            else {
+              tiny[i].style.visibility="hidden";
+              tinyv[i]=0;
+              return;
+            }
+          }
+          else tiny[i].style.visibility="hidden";
+        }
+        
+        document.onmousemove=mouse;
+        function mouse(e) {
+          if (e) {
+            y=e.pageY;
+            x=e.pageX;
+          }
+          else {
+            set_scroll();
+            y=event.y+sdown;
+            x=event.x+sleft;
+          }
+        }
+        
+        window.onscroll=set_scroll;
+        function set_scroll() {
+          if (typeof(self.pageYOffset)=='number') {
+            sdown=self.pageYOffset;
+            sleft=self.pageXOffset;
+          }
+          else if (document.body && (document.body.scrollTop || document.body.scrollLeft)) {
+            sdown=document.body.scrollTop;
+            sleft=document.body.scrollLeft;
+          }
+          else if (document.documentElement && (document.documentElement.scrollTop || document.documentElement.scrollLeft)) {
+            sleft=document.documentElement.scrollLeft;
+            sdown=document.documentElement.scrollTop;
+          }
+          else {
+            sdown=0;
+            sleft=0;
+          }
+        }
+        
+        window.onresize=set_width;
+        function set_width() {
+          var sw_min=999999;
+          var sh_min=999999;
+          if (document.documentElement && document.documentElement.clientWidth) {
+            if (document.documentElement.clientWidth>0) sw_min=document.documentElement.clientWidth;
+            if (document.documentElement.clientHeight>0) sh_min=document.documentElement.clientHeight;
+          }
+          if (typeof(self.innerWidth)=='number' && self.innerWidth) {
+            if (self.innerWidth>0 && self.innerWidth<sw_min) sw_min=self.innerWidth;
+            if (self.innerHeight>0 && self.innerHeight<sh_min) sh_min=self.innerHeight;
+          }
+          if (document.body.clientWidth) {
+            if (document.body.clientWidth>0 && document.body.clientWidth<sw_min) sw_min=document.body.clientWidth;
+            if (document.body.clientHeight>0 && document.body.clientHeight<sh_min) sh_min=document.body.clientHeight;
+          }
+          if (sw_min==999999 || sh_min==999999) {
+            sw_min=800;
+            sh_min=600;
+          }
+          swide=sw_min;
+          shigh=sh_min;
+        }
+        
+        function createDiv(height, width) {
+          var div=document.createElement("div");
+          div.style.position="absolute";
+          div.style.height=height+"px";
+          div.style.width=width+"px";
+          div.style.overflow="hidden";
+          return (div);
+        }
+        
+        function newColour() {
+          var c=new Array();
+          c[0]=255;
+          c[1]=Math.floor(Math.random()*256);
+          c[2]=Math.floor(Math.random()*(256-c[1]/2));
+          c.sort(function(){return (0.5 - Math.random());});
+          return ("rgb("+c[0]+", "+c[1]+", "+c[2]+")");
+        }
+        // ]]>
+        </script>
+</head>
+
+<title> PS70: Intro to Digital Fabrication </title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="./style.css" rel="stylesheet">
+
+<nav class="navbar navbar-expand-sm navbar-light bg-light">
+  <div style="align-items:center ; justify-content:center; font-family:georgia; font-size:x-large" class="container-fluid">
+    <h4><a style =  "color:darkgray; font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif" class="nav-link" href="./index.html">home</a></h4>
+    <h3 class="nav-title"> <b><i> ps70: intro to digital fabrication </i></b></h3>
+    <div class="navbar-nav">
+      <h4><a style = "color:darkgray; font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif" class="nav-link" href="./about.html">about</a></h4>
+    </div>
+  </div>
+</nav>
+
+<body>
+  <meta charset="UTF-8">
+
+<xmp style="display:none;">
+
+
+
+  <h1><p style="font-family:georgia; font-size:x-large"> <i><b> INFINITY MIRROR BOX </i></b> </p> </h1> 
+  <video width="1050" height="600" controls>
+    <source src="wifi1.mp4" type="video/mp4">
+  </video>
+
+
+  <h3><p style="font-family:georgia; font-size:x-large"> <i><b> background </i></b> </p> </h3> 
+  <p style="font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif">  This week was a group project where we programmed a microcontroller to obtain and respond to information from the internet or radio. The setup needed at least one input (web app) and one output (LED light strip).  Anh and Christina focused on the structure including power, design, and construction and Al set up the Firebase and web app. 
+
+  <h4><p style="font-family:georgia; font-size:x-large"> <i><b> materials </i></b> </p> </h4> 
+  <p style="font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif">  For the structure, we used 12 wood blocks and 5 mirrors. For the electronics, we used an ESP32-S2-DevKitC, a breadboard, and an LED light strip. For the software, we used VS Code, Firebase, and PlatformIO. </p> 
+
+  <h5><p style="font-family:georgia; font-size:x-large"> <i><b> building the structure </i></b> </p> </h5> 
+  <p style="font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif"> To build the structures, we constructed a frame and fit mirrors into the frame. We took .5 x .5 x 12 inch wooden blocks and cut 8 blocks that were 9 inches long and 4 blocks that were 10 inches long. We then assembled the blocks into a cube structure using nails. </p>
+    
+  <img src="wifi1.png" alt="box" width="500" </img> 
+ 
+  <p style="font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif">  Our mirrors were cut 9x9 inches, so we fit them into the frame and secured them using hot glue. Then, we attached the LEDs to wrap around the wooden frame inside the box. Finally, we covered the box in a reflective material  </p>
+  <img src="wifi 3.png" alt="big box" width="500" </img> 
+  <img src="wifi 2.png" alt="box" width="615" </img> 
+  <img src="wifi 4.png" alt="box" width="1120" </img> 
+
+  <h6><p style="font-family:georgia; font-size:x-large"> <i><b> wiring the structure </i></b> </p> </h6> 
+  <p style="font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif"> We ran into the most difficulties attempting to turn on the LED strip. It appeared that a strip of this length requires higher current than we were providing, and that we were using the wrong end of the strip to power the LEDs, which meant information was sent to the end of the LED strip as opposed to the beginning. To fix this, we used a power supply that Nathan gave us (5 V 10 A), and we soldered new wiring onto the opposite end of the LED strip and reattached the strip to the box.  </p>
+  
+  <h6><p style="font-family:georgia; font-size:x-large"> <i><b> creating the firebase web app </i></b> </p> </h6> 
+
+
+  <p style="font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif"> We thought this was a helpful diagram from RandomNerd to illustrate our project.</p>
+  <img src="wifi 5.png" alt="diagram" width="900" </img> 
+
+  <p style="font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif"> We followed <a href="https://randomnerdtutorials.com/esp32-firebase-realtime-database/">this tutorial</a> (the VS code version) to set up the Firebase,  <a href="https://randomnerdtutorials.com/esp32-firebase-web-app/">this tutorial</a> for the web app, and <a href="https://randomnerdtutorials.com/esp32-firebase-realtime-database/">this tutorial</a> to read data from Firebase. There were a few additional steps because the tutorials are intended for the esp32 and we were using an esp32-s2. The changes:</p>
+  <p style="font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif"> First, we received the error:</p>
+  <img src="wifi 10.png" alt="diagram" width="900" </img> 
+  <p style="font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif"> To fix this error, the board needs to be updated to board = esp32-s2-saola-1 which is the closest board to the esp32-s2-DevKitC. </p>
+  <img src="wifi 6.png" alt="diagram" width="900" </img> 
+  <p style="font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif"> There are two other changes that need to be made before trying the blinking light tutorial. Download the NeoPixel library to add the code that includes NeoPixel as shown below. Then updated the LED pin number to 18. </p>
+  <img src="wifi 7.png" alt="diagram" width="1100" </img> 
+  <p style="font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif"> Now on to using the code for the LED strip…
+
+    To make the LED strip work, we incorporated the code from the FastLED library example ColorPalette.ino. We could not get the LEDs to turn off using write functions so we opted to turn the brightness to 0. 
+    
+    To make the development process faster we used the local Firebase emulator so we did not have to push to Firebase each time. Additionally, the tutorial helped us identify that anonymous sign-ins would make the process quicker. 
+    
+    The Firebase web app has a simple on / off switch.
+    </p>
+    <img src="wifi 8.png" alt="diagram" width="900" </img> 
+    <p style="font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif"> It uses simple boolean as shown below in Firebase.</p>
+    <img src="wifi 9.png" alt="diagram" width="900" </img> 
+    <p style="font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif"> You can find the repo for this project on github at AlexandraWeiner/ps70-group and the web app on https://ps70-d90a6.firebaseapp.com/    </p>
+
+
+</xmp>
+</body>
+
+<script src="./strapdown.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" ></script>
+
+</html>
+
